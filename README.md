@@ -5,7 +5,8 @@ A simple lightweight script for fully customizable automation of eclipse photogr
 
 Being disappointed with the options available for eclipse photography - especially support for serial connections which enable much higher capture rates (such as Hap Griffin Astrocables https://imaginginfinity.com/astrocables.htm), I wrote my own. This assumes you can calculate your exact timings for c1, c2, c3, and c4 (such as through the Solar Eclipse Timer App https://www.solareclipsetimer.com/) but allows for full customizability of your imaging sessions, with effectively an infinite number of cameras. 
 
-I recommend you run this on OSX if you want voice notifications, but everything else should run on any system.
+I recommend you run this on OSX if you want voice notifications, you do need to install gphoto2 for camera control. (eg `sudo apt-get install gphoto2` or `brew install gphoto2`)
+
 ## Installation
 
 Clone and jump into the repository
@@ -32,7 +33,7 @@ To load your virtual environment again
 ```
 source .eclipse/bin/activate
 ```
-## Documentation
+## Running
 
 Edit info.json to add timings, cameras, and camera actions (see [below](#editing-info.json) for more info).
 
@@ -83,10 +84,15 @@ This section is where you enter your camera info.
 ```
 
 `camera_id` is the identification of your camera, if only one camera is used it is not necessary. We recommend you use the camera name specified by gphoto2 (you can check by running `./show_devices.sh`). This will allow the script to identify the usb port of the given equipment.
+
 `usb_port` (optional) the usb port of the camera. On macs this will show up under /dev/tty*usb* Keep in mind if you plug your camera into different ports this will change.
+
 `serial_port` required to control cameras via a serial port. run `./show_devices.sh` for a list of available serial devices.
+
 `f_ratio` required only when using the script to calculate your exposure times.
 `iso` required only when using the script to calculate your exposure times.
+
+
 `enhancement_factor` recommended when you want one camera to calculate exposure times differently than another. (just a constant scalar. This can be adjusted on the fly with the up and down arrows)
 
 ### phases
@@ -110,8 +116,11 @@ Each voice action represents a specific voice notification given at a specific t
 {"text": "First phase of the eclipse begins in 20 minutes.", "time": "c1", "offset": -1200, "voice": "Alex"},
 ```
 `text` is the phrase that is spoken
+
 `time` is the phase that is used as a time reference
+
 `offset` (optional) the number of seconds the notification is offset from that event. defaults to 0.
+
 `voice` to use one of the different Apple Voices (there are many) you can include it here.
 
 So to do a countdown to totality, you would add
