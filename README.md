@@ -1,23 +1,28 @@
 
 # Eclipse Automator
-___ 
 
-A simple lightweight script for fully customizable automation of eclipse photography. Controls any number of usb cameras and serial connections, with customizable voice event notifications and a simple terminal GUI.
+This script offers a sophisticated and lightweight solution for the automated orchestration of eclipse photography. It is designed to control an unlimited number of cameras through both USB and serial connections, and provides full customization of imaging sequences, user-defined voice notifications and a terminal-based graphical user interface (GUI).
 
-This package allows for photographers to utilize a single computer to control as many cameras as they like, and fully automates the process of eclipse photography for each camera down to a fraction of a second. This allows for sophisticated imaging sequences that can be run on multiple telescopes or imaging rigs in a fully hands-off manner. It supports serial connections, such as those for Canon cameras, allowing for significantly more (~10x) imagery to be acquired during the limited period of totality, relative to usb-controlled software. It can calculate expected exposure times based on your equipment, and can adjust exposure lengths on-the-fly with a keypress, allowing you to correct for over or under-exposed images immediately. It includes the ability to easily create custom audio notifications and countdowns at a precise time, and has a dashboard that displays the current active cameras, and upcoming event sequences and timings. This can all be completely customized to your particular setup through a single jsonfile. You can also test your automation sequence starting at any time with a single command.
+The utility enables photographers to manage multiple cameras from a single computer, facilitating separate sophisticated imaging sequences across multiple telescopes or imaging setups, allowing for virtually hands-free operation. Particularly, it supports serial connections, such as those used with Canon cameras, allowing for the capture of significantly more data during the critical period of totality.
 
-Eclipse photography is challenging- this script can help you automate the process so you can get the photos you want, while still enjoying the eclipse! 
+Key features include the calculation of optimal exposure times for the specific equipment used, along with the flexibility to adjust global exposure durations in real-time via simple keystrokes, ensuring immediate correction for any issues with under or overexposure. Furthermore, the software allows for the easy integration of custom audio alerts and countdowns.
 
+A simple dashboard presents a overview of active cameras, along with a queue of impending camera actions timings, and eclipse phase timer. This entire process is customizable through a single JSON file. Moreover, the script offers the functionality to run tests of your automation sequences at any chosen starting point via a single command.
+
+In summary, this script simplifies many of the technical complexities of eclipse photography, allowing photographers to capture sophisticated sequences while also being able to enjoy the eclipse itself.
 
 ![Example Run](./example.png)
+
 ___ 
+
 
 ## Requirements
 
-You will need a method to determine your particular eclipse timings. Options include the [Navy Calculator](https://aa.usno.navy.mil/data/SolarEclipses), [Photo Ephemeris](https://app.photoephemeris.com/), and the [Solar Eclipse Timer App](https://www.solareclipsetimer.com/).
+In running the script, you will need to install the python libraries, and then edit the info.json file to include phase times, your equipment, and desired image sequence and voice notifications (see below for explanation of the json schema). 
+
+Currently, you will need some method to determine your particular eclipse timings given your location. Options include the [Navy Calculator](https://aa.usno.navy.mil/data/SolarEclipses), [Photo Ephemeris](https://app.photoephemeris.com/), and the [Solar Eclipse Timer App](https://www.solareclipsetimer.com/).
 
 You will need a camera and a usb connection. gphoto2 is required for usb camera control. (eg `sudo apt-get install gphoto2` or `brew install gphoto2`) Event audio notifcations are currently only supported by OSX.
-
 
 ___ 
 
@@ -81,9 +86,9 @@ On the day of the eclipse simply run
 ```
 
 
-## Editing info.json
+## Schema for info.json
 
-The info jsonfile is structured into a 5 parts events, equipment, phases, voice_actions, and camera actions. This is where you set timings, and orchestration for all your cameras.
+The info jsonfile is structured into a 5 parts: events, equipment, phases, voice_actions, and camera actions. This is where you set timings, and orchestration for all your cameras. You can create several different jsonfiles, and run each with the --input filename.json in the run.py command.
 
 ### events
 
@@ -168,7 +173,7 @@ These can be referenced in the same way as the above, for a single photograph at
 
 `text` is the text shown on the GUI when the event is being run, or queued.
 
-`shutter` is the given shutter speed for that action.
+`shutter` is the given shutter speed for that action. The script will calculate shutter times for your equipment if a specific string is input here (see below).
 
 `time`, `start` and `end` are used as a time reference for that event (should be "c1","c2","max","c3","or c4")
 
@@ -203,8 +208,13 @@ if multiple cameras are used, you must include a `camera_id` value for each came
 {"text": "5d Totality", "shutter": "1/250", "start": "c2", "end": "c3", "camera_id": "Canon EOS 5d Mark IV"}
 ```
 
+Additionally, if any of the strings below are inserted in the `shutter` field, eclipse times are calculated in accordance with [this NASA Exposure Guide](https://umbra.nascom.nasa.gov/eclipse/980226/tables/table_26.html):
 
-This makes for a robust and powerful method for controlling multiple cameras. Here we include an example of a sequence that captures partial phases with a 30 second interval, captures Baily's Beads, brackets up through exposures, captures the Earthshine during max eclipse (when the moon is centered), brackets down through exposures and then captures Baily's beads, transitioning into a photo every 30 seconds during the partial phase.
+```
+'Partial, ND 4.0', 'Partial, ND 5.0', 'Baily\'s Beads', 'Chromosphere', 'Prominences', 'Corona - 0.1 Rs','Corona - 0.2 Rs', 'Corona - 0.5 Rs', 'Corona - 1.0 Rs', 'Corona - 2.0 Rs', 'Corona - 4.0 Rs', 'Corona - 8.0 Rs'
+```
+
+This all makes for a robust and powerful method for controlling multiple cameras. Here we include an example of a sequence that captures partial phases with a 30 second interval, captures Baily's Beads, brackets up through exposures, captures the Earthshine during max eclipse (when the moon is centered), brackets down through exposures and then captures Baily's beads, transitioning into a photo every 30 seconds during the partial phase.
 ```
 "camera_actions":[
 	{"text": "Partial Phase", "shutter": "1/200", "start": "c1", "end":"c2", "end_offset":-14, "interval": 30},
