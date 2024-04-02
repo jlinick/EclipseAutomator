@@ -1,50 +1,71 @@
 
 # Eclipse Automator
+___ 
 
 A simple lightweight script for fully customizable automation of eclipse photography. Controls any number of usb cameras and serial connections, with customizable voice event notifications and a simple terminal GUI.
 
-Being disappointed with the options available for eclipse photography - especially support for serial connections which enable much higher capture rates (such as Hap Griffin Astrocables https://imaginginfinity.com/astrocables.htm), I wrote my own. This assumes you can calculate your exact timings for c1, c2, c3, and c4 (such as through the Solar Eclipse Timer App https://www.solareclipsetimer.com/) but allows for full customizability of your imaging sessions, with effectively an infinite number of cameras. 
+This package allows for photographers to utilize a single computer to control as many cameras as they like, and fully automates the process of eclipse photography for each camera down to a fraction of a second. This allows for sophisticated imaging sequences that can be run on multiple telescopes or imaging rigs in a fully hands-off manner. It supports serial connections, such as those for Canon cameras, allowing for significantly more (~10x) imagery to be acquired during the limited period of totality, relative to usb-controlled software. It can calculate expected exposure times based on your equipment, and can adjust exposure lengths on-the-fly with a keypress, allowing you to correct for over or under-exposed images immediately. It includes the ability to easily create custom audio notifications and countdowns at a precise time, and has a dashboard that displays the current active cameras, and upcoming event sequences and timings. This can all be completely customized to your particular setup through a single jsonfile. You can also test your automation sequence starting at any time with a single command.
 
-I recommend you run this on OSX if you want voice notifications, you do need to install gphoto2 for camera control. (eg `sudo apt-get install gphoto2` or `brew install gphoto2`)
+Eclipse photography is challenging- this script can help you automate the process so you can get the photos you want, while still enjoying the eclipse! 
+
+
+![Example Run](./example.png)
+___ 
+
+## Requirements
+
+You will need a method to determine your particular eclipse timings. Options include the [Navy Calculator](https://aa.usno.navy.mil/data/SolarEclipses), [Photo Ephemeris](https://app.photoephemeris.com/), and the [Solar Eclipse Timer App](https://www.solareclipsetimer.com/).
+
+You will need a camera and a usb connection. gphoto2 is required for usb camera control. (eg `sudo apt-get install gphoto2` or `brew install gphoto2`) Event audio notifcations are currently only supported by OSX.
+
+
+___ 
 
 ## Installation
 
-Clone and jump into the repository
+
+Clone and jump into the repository with
 
 ```
 git clone https://github.com/jlinick/EclipseAutomator.git
 cd EclipseAutomator
 ```
 
-(Optional) set up a virtual environment
+(Optionally) set up a virtual environment
 ```
 python3 -m venv .eclipse
 ```
-
 
 Install requisite python packages
 ```
 python3 -m venv .eclipse
 pip install -r requirements.txt
 ```
+and you're good to go!
 
+If you installed a virtual environment, you can exit with 
+```
+deactivate
+```
 
-To load your virtual environment again
+and to load your virtual environment again
 ```
 source .eclipse/bin/activate
 ```
+___ 
+
 ## Running
 
-Edit info.json to add timings, cameras, and camera actions (see [below](#editing-info.json) for more info).
+For full customization of timings, cameras, and camera actions, see [below](#editing-info.json).
 
-Run a test of the Eclipse Automator plug in your camera and run:
+To test Eclipse Automator, plug in your camera and run
 ```
 ./run.py --test -95
 ```
-This starts a test 95 seconds before c2, change the number to change where the test starts.
+This starts a test 95 seconds before c2. Simply change the number to change where the test starts. Positive numbers will be after the start of totality, negative numbers will be before it.
 
 
-To run with or without gui/voice notifications/input capture
+To run with or without gui/voice notifications/keyboard input run
 ```
 ./run.py --nodisplay --nosound --noinput
 ```
@@ -54,7 +75,12 @@ Or change the input.json file to a different one
 ./run.py --input --test.json
 ```
 
-The automator will generate a run.log logfile, which you can inspect for any warnings or if there are any issues.
+On the day of the eclipse simply run
+```
+./run.py
+```
+
+
 ## Editing info.json
 
 The info jsonfile is structured into a 5 parts events, equipment, phases, voice_actions, and camera actions. This is where you set timings, and orchestration for all your cameras.
@@ -71,7 +97,7 @@ The events list is where you specify the timing of c1, c2, c3, max eclipse, and 
     {"name": "c4", "time": "2024-04-08 12:57:30.3", "text": "End of Eclipse"}
 ],
 ```
-All of the subsequent events are based on these times, so these need to be entered precisely.
+All of the subsequent events are based on these times, so these need to be entered precisely. *note that all times should be in local time - or in whatever time your computer is set to*
 
 ### equipment
 
@@ -83,21 +109,22 @@ This section is where you enter your camera info.
 ],
 ```
 
-`camera_id` is the identification of your camera, if only one camera is used it is not necessary. We recommend you use the camera name specified by gphoto2 (you can check by running `./show_devices.sh`). This will allow the script to identify the usb port of the given equipment.
+`camera_id` should uniquely identify your camera, if only one camera is used it is not necessary. We recommend you use the camera name specified by gphoto2 (you can check by running `./show_devices.sh`). This will allow the script to identify the usb port of your equipment regardless if the port is connected to your computer. Otherwise, if you change the port your camera is plugged into you will need to specify the correct port in usb_port below.
 
-`usb_port` (optional) the usb port of the camera. On macs this will show up under /dev/tty*usb* Keep in mind if you plug your camera into different ports this will change.
+`usb_port` (optional) the usb port of the camera. This will show up under /dev/tty\*usb\* Keep in mind if you plug your camera into different ports this will change. Runing `./show_devices.sh` should show you your connected cameras and their specific usb ports.
 
 `serial_port` required to control cameras via a serial port. run `./show_devices.sh` for a list of available serial devices.
 
 `f_ratio` required only when using the script to calculate your exposure times.
+
 `iso` required only when using the script to calculate your exposure times.
 
 
-`enhancement_factor` recommended when you want one camera to calculate exposure times differently than another. (just a constant scalar. This can be adjusted on the fly with the up and down arrows)
+`enhancement_factor` recommended when you want one camera to calculate exposure times differently than another. (just a constant scalar. This can be adjusted on the fly with the up and down arrows on the keyboard)
 
 ### phases
 
-Unless you want to add or remove a new phase, you can just leave this alone. It's only used to update the text graphic for the given phase.
+Unless you decide to add or remove a new event above, you can leave this alone. It's only used to update the text graphic for the given phase.
 
 ```
 "phases":[
@@ -111,7 +138,8 @@ Unless you want to add or remove a new phase, you can just leave this alone. It'
 
 ### voice_actions
 
-Each voice action represents a specific voice notification given at a specific time, referenced to a phase as given in the events above.
+Each voice action represents a specific audio notification given at a specific time. This is where you enter each voice action. Each action is referenced to a specific time (determined by the events above.)
+
 ```
 {"text": "First phase of the eclipse begins in 20 minutes.", "time": "c1", "offset": -1200, "voice": "Alex"},
 ```
@@ -139,8 +167,11 @@ So to do a countdown to totality, you would add
 These can be referenced in the same way as the above, for a single photograph at a specific time, but camera_actions also support photos taken every X intervals, or as many shots of a specific type as possible, over a given period.
 
 `text` is the text shown on the GUI when the event is being run, or queued.
+
 `shutter` is the given shutter speed for that action.
+
 `time`, `start` and `end` are used as a time reference for that event (should be "c1","c2","max","c3","or c4")
+
 `offset` `start_offset` and `end_offset` are used with `time` to offset (in seconds) relative to the given event. it should be a negative or positive integer, negative for before the event, and positive after. This controls when the event starts and ends.
 
 
@@ -173,32 +204,32 @@ if multiple cameras are used, you must include a `camera_id` value for each came
 ```
 
 
-This makes for a robust and powerful method for controlling multiple cameras. An example of capturing partial phases with a 30 second interval, then capturing Baily's Beads, bracketing up through exposures, capturing Earthshine, bracketing down through exposures and capturing the exiting Baily's beads, to transition into a Partial Phase 30 second interval is shown below.
+This makes for a robust and powerful method for controlling multiple cameras. Here we include an example of a sequence that captures partial phases with a 30 second interval, captures Baily's Beads, brackets up through exposures, captures the Earthshine during max eclipse (when the moon is centered), brackets down through exposures and then captures Baily's beads, transitioning into a photo every 30 seconds during the partial phase.
 ```
-	"camera_actions":[
-		{"text": "Partial Phase", "shutter": "1/200", "start": "c1", "end":"c2", "end_offset":-14, "interval": 30},
-		{"text": "Capturing Baily's Beads", "shutter": "Baily's Beads", "start": "c2", "start_offset": -12, "end":"c2", "end_offset": 6},
-		{"text": "Capturing Chromosphere", "shutter": "Chromosphere", "start":"c2", "start_offset":6, "end":"c2", "end_offset":16},
-		{"text": "Capturing Prominences", "shutter": "Prominences", "start":"c2", "start_offset":16, "end":"c2", "end_offset":26},
-		{"text": "Corona - 0.1 Rs", "shutter": "Corona - 0.1 Rs", "start":"c2", "start_offset":26, "end":"c2", "end_offset":36},
-		{"text": "Corona - 0.5 Rs", "shutter": "Corona - 0.5 Rs", "start":"c2", "start_offset":36, "end":"c2", "end_offset":46},
-		{"text": "Corona - 1.0 Rs", "shutter": "Corona - 1.0 Rs", "start":"c2", "start_offset":46, "end":"c2", "end_offset":56},
-		{"text": "Corona - 2.0 Rs", "shutter": "Corona - 2.0 Rs", "start":"c2", "start_offset":56, "end":"c2", "end_offset":66},
-		{"text": "Corona - 4.0 Rs", "shutter": "Corona - 4.0 Rs", "start":"c2", "start_offset":66, "end":"c2", "end_offset":76},
-		{"text": "Corona - 8.0 Rs", "shutter": "Corona - 8.0 Rs", "start":"c2", "start_offset":76, "end":"c2", "end_offset":86},
-		{"text": "Corona - 0.1 Rs", "shutter": "Corona - 0.1 Rs", "start":"c2", "start_offset":86, "end":"max", "end_offset":-16},
-		{"text": "Earthshine", "shutter":"8", "start":"max", "start_offset":-16, "end":"max", "end_offset":16},
-		{"text": "Corona - 8.0 Rs", "shutter": "Corona - 8.0 Rs", "start":"max", "start_offset":16, "end":"max", "end_offset":26},
-		{"text": "Corona - 4.0 Rs", "shutter": "Corona - 4.0 Rs", "start":"max", "start_offset":26, "end":"max", "end_offset":36},	
-		{"text": "Corona - 2.0 Rs", "shutter": "Corona - 2.0 Rs", "start":"max", "start_offset":36, "end":"max", "end_offset":46},
-		{"text": "Corona - 1.0 Rs", "shutter": "Corona - 1.0 Rs", "start":"max", "start_offset":46, "end":"max", "end_offset":56},
-		{"text": "Corona - 0.5 Rs", "shutter": "Corona - 0.5 Rs", "start":"max", "start_offset":56, "end":"max", "end_offset":66},
-		{"text": "Corona - 0.1 Rs", "shutter": "Corona - 0.1 Rs", "start":"max", "start_offset":66, "end":"max", "end_offset":76},
-		{"text": "Capturing Prominences", "shutter": "Prominences", "start":"max", "start_offset":76, "end":"max", "end_offset":86},
-		{"text": "Capturing Chromosphere", "shutter": "Chromosphere", "start":"max", "start_offset":86, "end":"c3", "end_offset":0},
-		{"text": "Capturing Baily's Beads", "shutter": "Baily's Beads", "start": "c3", "end_offset": 0, "end":"c3", "end_offset": 12},
-		{"text": "Partial Phase", "shutter": "1/200", "start": "c3", "end": "c4", "start_offset": 14, "interval":30}
-	]
+"camera_actions":[
+	{"text": "Partial Phase", "shutter": "1/200", "start": "c1", "end":"c2", "end_offset":-14, "interval": 30},
+	{"text": "Capturing Baily's Beads", "shutter": "Baily's Beads", "start": "c2", "start_offset": -12, "end":"c2", "end_offset": 6},
+	{"text": "Capturing Chromosphere", "shutter": "Chromosphere", "start":"c2", "start_offset":6, "end":"c2", "end_offset":16},
+	{"text": "Capturing Prominences", "shutter": "Prominences", "start":"c2", "start_offset":16, "end":"c2", "end_offset":26},
+	{"text": "Corona - 0.1 Rs", "shutter": "Corona - 0.1 Rs", "start":"c2", "start_offset":26, "end":"c2", "end_offset":36},
+	{"text": "Corona - 0.5 Rs", "shutter": "Corona - 0.5 Rs", "start":"c2", "start_offset":36, "end":"c2", "end_offset":46},
+	{"text": "Corona - 1.0 Rs", "shutter": "Corona - 1.0 Rs", "start":"c2", "start_offset":46, "end":"c2", "end_offset":56},
+	{"text": "Corona - 2.0 Rs", "shutter": "Corona - 2.0 Rs", "start":"c2", "start_offset":56, "end":"c2", "end_offset":66},
+	{"text": "Corona - 4.0 Rs", "shutter": "Corona - 4.0 Rs", "start":"c2", "start_offset":66, "end":"c2", "end_offset":76},
+	{"text": "Corona - 8.0 Rs", "shutter": "Corona - 8.0 Rs", "start":"c2", "start_offset":76, "end":"c2", "end_offset":86},
+	{"text": "Corona - 0.1 Rs", "shutter": "Corona - 0.1 Rs", "start":"c2", "start_offset":86, "end":"max", "end_offset":-16},
+	{"text": "Earthshine", "shutter":"8", "start":"max", "start_offset":-16, "end":"max", "end_offset":16},
+	{"text": "Corona - 8.0 Rs", "shutter": "Corona - 8.0 Rs", "start":"max", "start_offset":16, "end":"max", "end_offset":26},
+	{"text": "Corona - 4.0 Rs", "shutter": "Corona - 4.0 Rs", "start":"max", "start_offset":26, "end":"max", "end_offset":36},	
+	{"text": "Corona - 2.0 Rs", "shutter": "Corona - 2.0 Rs", "start":"max", "start_offset":36, "end":"max", "end_offset":46},
+	{"text": "Corona - 1.0 Rs", "shutter": "Corona - 1.0 Rs", "start":"max", "start_offset":46, "end":"max", "end_offset":56},
+	{"text": "Corona - 0.5 Rs", "shutter": "Corona - 0.5 Rs", "start":"max", "start_offset":56, "end":"max", "end_offset":66},
+	{"text": "Corona - 0.1 Rs", "shutter": "Corona - 0.1 Rs", "start":"max", "start_offset":66, "end":"max", "end_offset":76},
+	{"text": "Capturing Prominences", "shutter": "Prominences", "start":"max", "start_offset":76, "end":"max", "end_offset":86},
+	{"text": "Capturing Chromosphere", "shutter": "Chromosphere", "start":"max", "start_offset":86, "end":"c3", "end_offset":0},
+	{"text": "Capturing Baily's Beads", "shutter": "Baily's Beads", "start": "c3", "end_offset": 0, "end":"c3", "end_offset": 12},
+	{"text": "Partial Phase", "shutter": "1/200", "start": "c3", "end": "c4", "start_offset": 14, "interval":30}
+]
 ```
 
 an example json is included as info.json.
@@ -208,6 +239,28 @@ When you are finished editing your jsonfile, run the program with
 ```
 ./run.py --input your_json_file_path
 ```
+
+___ 
+
+## Troubleshooting
+
+
+Note that many cameras will go to sleep if connected to a usb port without activity for a set period of time, and therefore will not show up as a connected device. So before running your script, either reset the camera or press the shutter to wake the camera. If the camera is left connected but not used for some time, it may turn off and not recognize usb commands (so we recommend keeping it on an interval). A serial cable connection will still work and should wake the camera in these situations. Currently we recommend you run `show_devices.sh` before you start your script, to make sure usb cameras are connected. Note that if you leave some image editing programs running (like Adobe Lightroom/Photoshop), they will block use of these usb devices, so we recommend closing these programs before use.
+
+Currently the script does not validate the jsonfile. So a typo there will likely cause the script not to run. Make sure your json is formatted properly!
+
+Running the script will generate a run.log logfile, which you should inspect if you run into any issues.
+
+___ 
+
+## Miscellaneous
+
+Future work includes the ability to referece camera actions into sequences, and then run specific sequences in whatever order you like (or as filler, for example). I would also like have an optional query to the [US Navy's API](https://aa.usno.navy.mil/data/api) to set the timings from your location. Neither of these will likely be added before the April 8th, 2024 eclipse- unless, of course, you decide to add them yourself!
+
+For serial cable connections we recommend [Hap Griffin Astrocables](https://imaginginfinity.com/astrocables.htm), or [make your own!](https://www.covingtoninnovations.com/dslr/canonrelease40d.html).
+
+
+___ 
 
 ## Authors
 

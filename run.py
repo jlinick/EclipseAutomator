@@ -1234,7 +1234,6 @@ def argparser():
     parse.add_argument("--nosound", action='store_true', default=False, help="runs without sound alerts")
     parse.add_argument("--noinput", action='store_true', default=False, help="runs without keyboard input")
     parse.add_argument("--verbose", action='store_true', default=False, help="verbose mode")
-
     return parse
 
 
