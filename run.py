@@ -38,7 +38,7 @@ allowable_targets = ['Partial, ND 4.0', 'Partial, ND 5.0', 'Baily\'s Beads', 'Ch
 class EclipseAutomation():
     '''main object for running eclipse automation loop'''
 
-    def __init__(self, test=None, inputfile='input.json', nodisplay=False, nosound=False, noinput=False, verbose=False):
+    def __init__(self, test=None, inputfile='input.json', nodisplay=False, nosound=False, noinput=False, verbose=False, contact_time=None):
         logging.info('--------------------starting run.--------------------') # imports for optional libraries
         self.test = test
         self.inputfile = inputfile
@@ -49,7 +49,7 @@ class EclipseAutomation():
         logging.info('initializing objects and parsing json')
         self.t = Timeholder(inputfile) # parses json, creates event/phase/action objects
         if not test is None:
-            self.t.start_test(offset=test, event='c2') # test mode
+            self.t.start_test(offset=test, event=contact_time) # test mode
         self.dispatcher = CameraDispatch(self.t.json_obj) # instantiate the dipatch object, which will create camera objects, threads and queues
         if nodisplay is False:
             self.layout = self.init_layout()
@@ -376,7 +376,7 @@ class Events():
     def __init__(self, json_obj, tzinfo):
         self.tzinfo = tzinfo
         self.events = []
-        events_list = json_obj.get('events', [])
+        events_list = json_obj.get('contact_times', [])
         # parse the json dict and create events
         for ev in events_list:
             self.events.append(Event(ev, tzinfo))
@@ -1222,7 +1222,8 @@ def argparser():
     '''
     parse = argparse.ArgumentParser(description="Run Eclipse Automator for controlling USB and Serial Cameras")
     parse.add_argument('--input', type=str, default='info.json', help="Path to the JSON config file. Default is 'info.json'.")    
-    parse.add_argument('--test',required=False, default=None, type=int, metavar='X', help='Initiate a test run X seconds (positive or negative) from c2 (start of totality)')
+    parse.add_argument('--test',required=False, default=None, type=int, metavar='X', help='Initiate a test run X seconds (positive or negative) from the given contact time')
+    parse.add_argument('--contact_time',required=False, default='c2', choices=['c1','c2','max','c3','c4'], metavar='X', help='The contact time to reference when running a test.')
     parse.add_argument("--nodisplay", action='store_true', default=False, help="runs without the graphical display")
     parse.add_argument("--nosound", action='store_true', default=False, help="runs without sound alerts")
     parse.add_argument("--noinput", action='store_true', default=False, help="runs without keyboard input")
@@ -1242,5 +1243,5 @@ if __name__ == '__main__':
         import pyfiglet
     if args.noinput is False:
         from pynput import keyboard 
-    e = EclipseAutomation(test=args.test, inputfile=args.input, nodisplay=args.nodisplay, nosound=args.nosound, noinput=args.noinput, verbose=args.verbose) # instantiate our main objects and run main loop
+    e = EclipseAutomation(test=args.test, inputfile=args.input, nodisplay=args.nodisplay, nosound=args.nosound, noinput=args.noinput, verbose=args.verbose, contact_time=args.contact_time) # instantiate our main objects and run main loop
     

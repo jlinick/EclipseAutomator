@@ -1,5 +1,5 @@
 {
-	"events":[
+	"contact_times":[
 		{"name": "c1", "time": "2024-04-08T12:16:52.900000-05:00", "text": "First Contact"},
 		{"name": "c2", "time": "2024-04-08T13:34:22.3-05:00", "text": "Beginning of Totality"},
 		{"name": "max","time": "2024-04-08T13:36:33.8-05:00", "text": "Maximum Eclipse"},

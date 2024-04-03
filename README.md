@@ -57,7 +57,7 @@ For full customization of timings, cameras, and camera actions, see [below](#edi
 
 To test Eclipse Automator, plug in your camera and run
 ```
-./run.py --test -95
+./run.py --test -95 --contact_time c2
 ```
 This starts a test 95 seconds before c2. Simply change the number to change where the test starts. Positive numbers will be after the start of totality, negative numbers will be before it.
 
@@ -86,7 +86,7 @@ For more information
 ## Determining your Eclipse timings
 
 
-You will need to input your observing location if you want the script to determine the exact timings of the eclipse. This is done through the `determine_times.py` script. 
+You will need to input your observing location if you want the script to determine the exact contact times of the eclipse. This is done through the `determine_times.py` script. 
 
 If you have a gps connected device you can run
 ```
@@ -103,7 +103,7 @@ Alternatively you can enter your location manually. An example for the 2024 Tota
 ./determine_times.py --lat 30.639372 --lon -98.409038 --height 258 --date 2024-04-08 --input info.json
 ```
 
-This will query the US Naval Observatory API for the exact eclipse timings for your location, then parse the response and fill out info.json with the event times. This does require an internet connection to run, so we recommend you run this either ahead of time, or, if you are mobile on the day of the eclipse connect to a mobile hotspot. Alternatively, you can use an eclipse timing app and input the times into the json [(see events below)](#events-(optional)).
+This will query the US Naval Observatory API for the exact eclipse timings for your location, then parse the response and fill out info.json. This does require an internet connection to run, so we recommend you run this either ahead of time, or, if you are mobile on the day of the eclipse connect to a mobile hotspot. Alternatively, you can use an eclipse timing app and input the times into the json [(see contact_times below)](#contact_times-(optional)).
 
 You can see more details about how to run the script through
 
@@ -114,14 +114,14 @@ You can see more details about how to run the script through
 
 ## Schema for info.json
 
-The info jsonfile is structured into a 5 parts: events, equipment, phases, voice_actions, and camera actions. This is where you set timings, and orchestration for all your cameras. You can create several different jsonfiles, and run each with the --input filename.json in the run.py command.
+The info jsonfile is structured into a 5 parts: contact_times, equipment, phases, voice_actions, and camera actions. This is where you set timings, and orchestration for all your cameras. You can create several different jsonfiles, and run each with the --input filename.json in the run.py command.
 
-### events (optional)
+### contact_times (optional)
 
 If you didn't use the `determine_times.py` script and want to set eclipse timings manually, you can find timings from other sources such as [Photo Ephemeris](https://app.photoephemeris.com/) or the [Solar Eclipse Timer App](https://www.solareclipsetimer.com/), and fill in the proper ISO format as shown below:
 
 ```
-"events":[
+"contact_times":[
     {"name": "c1", "time": "2024-04-08T12:16:53.200000-05:00", "text": "First Contact"},
     {"name": "c2", "time": "2024-04-08T13:34:15.700000-05:00", "text": "Beginning of Totality"},
     {"name": "max","time": "2024-04-08T13:36:27-05:00", "text": "Maximum Eclipse"},
@@ -129,7 +129,7 @@ If you didn't use the `determine_times.py` script and want to set eclipse timing
     {"name": "c4", "time": "2024-04-08T14:57:25.800000-05:00", "text": "End of Eclipse"}
 ],
 ```
-All of the subsequent events are based on these times, so these need to be entered precisely. We recommend you use proper ISO formatting with the timezone. It is better to be explicit rateher than implicit, and if timezone is not included, the timings will default to your currently set computer timezone.
+*Note that the automated actions are all based on these times, so these do need to be entered properly. If you enter them manually we recommend you use proper ISO formatting that includes the timezone, as it is better to be explicit rather than implicit- if timezone is not included the timings will default to your currently set computer timezone on runtime.*
 
 ### equipment
 
@@ -170,7 +170,7 @@ Unless you decide to add or remove a new event above, you can leave this alone. 
 
 ### voice_actions
 
-Each voice action represents a specific audio notification given at a specific time. This is where you enter each voice action. Each action is referenced to a specific time (determined by the events above.)
+Each voice action represents a specific audio notification given at a specific time. This is where you enter each voice action. Each action is referenced to a specific time (determined by the contact_times above.)
 
 ```
 {"text": "First phase of the eclipse begins in 20 minutes.", "time": "c1", "offset": -1200, "voice": "Alex"},
@@ -179,7 +179,7 @@ Each voice action represents a specific audio notification given at a specific t
 
 `time` is the phase that is used as a time reference
 
-`offset` (optional) the number of seconds the notification is offset from that event. defaults to 0.
+`offset` (optional) the number of seconds the notification is offset from that contact_time. defaults to 0.
 
 `voice` to use one of the different Apple Voices (there are many) you can include it here.
 
@@ -198,13 +198,13 @@ So to do a countdown to totality, you would add
 
 These can be referenced in the same way as the above, for a single photograph at a specific time, but camera_actions also support photos taken every X intervals, or as many shots of a specific type as possible, over a given period.
 
-`text` is the text shown on the GUI when the event is being run, or queued.
+`text` is the text shown on the GUI when the action is being run, or queued.
 
 `shutter` is the given shutter speed for that action. The script will calculate shutter times for your equipment if a specific string is input here (see below).
 
-`time`, `start` and `end` are used as a time reference for that event (should be "c1","c2","max","c3","or c4")
+`time`, `start` and `end` are used as a time reference for that contact_time (should be "c1","c2","max","c3","or c4")
 
-`offset` `start_offset` and `end_offset` are used with `time` to offset (in seconds) relative to the given event. it should be a negative or positive integer, negative for before the event, and positive after. This controls when the event starts and ends.
+`offset` `start_offset` and `end_offset` are used with `time` to offset (in seconds) relative to the given contact_time. it should be a negative or positive integer, negative for before the contact_time, and positive after. This controls when the action starts and ends.
 
 
 A few examples: 

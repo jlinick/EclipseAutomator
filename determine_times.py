@@ -12,7 +12,7 @@ import serial
 import serial.tools.list_ports
 import pynmea2
 
-'''retrieves the specific eclipse timings given your lat, lon, height, and eclipse date'''
+'''retrieves the specific eclipse contact times given your lat, lon, height, and eclipse date'''
 
 def get_eclipse_times(lat, lon, height, date):
     '''retrieves the specific eclipse timings given your lat (decimal), lon (decimal), height (meters), and eclipse date'''
@@ -90,14 +90,14 @@ def get_timezone(lat, lon):
     timz = TimezoneFinder() 
     return pytz.timezone(timz.timezone_at(lng=lon, lat=lat))
 
-def update_event_times(file_path, time_mapping):
+def update_contact_times(file_path, time_mapping):
     # Load the JSON data from the file
     with open(file_path, 'r') as file:
         data = json.load(file)
-    # Check if 'events' key exists in the JSON data
-    if 'events' in data:
+    # Check if 'contact_times' key exists in the JSON data
+    if 'contact_times' in data:
         # Iterate over each event in the list
-        for event in data['events']:
+        for event in data['contact_times']:
             # If the event's name is in the time_mapping dictionary, update its time
             if event['name'] in time_mapping:
                 event['time'] = time_mapping[event['name']]
@@ -175,14 +175,14 @@ def run(json_file, lat, lon, height, date=None, noupdate=False, auto=False):
         return
     # update the json
     print(f'updating json file: {json_file}...')
-    update_event_times(json_file, tim_map)
+    update_contact_times(json_file, tim_map)
     print('update complete.')
 
 def argparser():
     '''
     Construct a parser to parse arguments, returns the parser
     '''
-    parse = argparse.ArgumentParser(description="Run Eclipse Automator for controlling USB and Serial Cameras")
+    parse = argparse.ArgumentParser(description="Updates eclipse contact times given location information")
     parse.add_argument('--input', type=str, default='info.json', help="Path to the JSON config file. Default is 'info.json'.")    
     parse.add_argument('--lat', required=False, type=float, default=None, help='Decimal latitude of your location (within the path of totality)')
     parse.add_argument('--lon', required=False, type=float, default=None, help='Decimal longitude of your location (within the path of totality)')
