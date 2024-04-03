@@ -1,11 +1,9 @@
 
 # Eclipse Automator
 
-This script offers a sophisticated and lightweight solution for the automated orchestration of eclipse photography. It is designed to control an unlimited number of cameras through both USB and serial connections, and provides full customization of imaging sequences, user-defined voice notifications and a terminal-based graphical user interface (GUI).
+This script offers a lightweight and fully customizable solution for the automated orchestration of photography of total solar eclipses. It is designed to control an unlimited number of cameras through both USB and serial connections, and allows users to completely customize their imaging sequences, by device. It provices optional customizable voice notifications, audio alerts, and countdowns, alongside an optional terminal-based graphical user interface (GUI). It can determine appropriate of exposure times based on your equipment, and supports gps devices for automatic determination of eclipse timings.
 
-The utility enables photographers to manage multiple cameras from a single computer, facilitating separate sophisticated imaging sequences across multiple telescopes or imaging setups, allowing for virtually hands-free operation. Particularly, it supports serial connections, such as those used with Canon cameras, allowing for the capture of significantly more data during the critical period of totality.
-
-Key features include the calculation of optimal exposure times for the specific equipment used, along with the flexibility to adjust global exposure durations in real-time via simple keystrokes, ensuring immediate correction for any issues with under or overexposure. Furthermore, the software allows for the easy integration of custom audio alerts and countdowns.
+This utility enables photographers to manage multiple cameras from a single computer, facilitating sophisticated imaging sequences to be run virtually hands-free. Particularly, it supports serial connections, such as those used with Canon cameras, allowing for the capture of significantly more data during the critical period of totality. It also provides the ability to adjust global exposure durations in real-time via the up and down keypresses, allowing for immediate correction of any issues with under or overexposure.
 
 A simple dashboard presents a overview of active cameras, along with a queue of impending camera actions timings, and eclipse phase timer. This entire process is customizable through a single JSON file. Moreover, the script offers the functionality to run tests of your automation sequences at any chosen starting point via a single command.
 
@@ -13,16 +11,12 @@ In summary, this script simplifies many of the technical complexities of eclipse
 
 ![Example Run](./example.png)
 
-___ 
-
-
 ## Requirements
 
 In running the script, you will need to install the python libraries, and then edit the info.json file to include phase times, your equipment, and desired image sequence and voice notifications (see below for explanation of the json schema).
 
 You will need a camera and a usb connection. gphoto2 is required for usb camera control. (eg `sudo apt-get install gphoto2` or `brew install gphoto2`) Event audio notifcations are currently only supported by OSX. An internet connection is necessary to update eclipse timings if your observing location changes, but is not required to run the orchestration script.
 
-___ 
 
 ## Installation
 
@@ -55,7 +49,7 @@ and to load your virtual environment again
 ```
 source .eclipse/bin/activate
 ```
-___ 
+
 
 ## Running
 
@@ -88,12 +82,22 @@ For more information
 ./run.py --help
 ```
 
-___ 
 
 ## Determining your Eclipse timings
 
 
-You will need to input your observing location if you want the script to determine the exact timings of the eclipse. This is done through the `determine_times.py` script. An example for the 2024 Total Eclipse would be
+You will need to input your observing location if you want the script to determine the exact timings of the eclipse. This is done through the `determine_times.py` script. 
+
+If you have a gps connected device you can run
+```
+./determine_times.py --auto
+```
+And the script will find your gps device, wait for it to return position data, query the US Naval Observatory for eclipse timings for the next known total eclipse, and then fill info.json with those timings. You can also enter the date of a particular eclipse, as in
+```
+./determine_times.py --auto --date 2024-04-08
+```
+
+Alternatively you can enter your location manually. An example for the 2024 Total Eclipse would be
 
 ```
 ./determine_times.py --lat 30.639372 --lon -98.409038 --height 258 --date 2024-04-08 --input info.json
@@ -107,7 +111,6 @@ You can see more details about how to run the script through
 ./determine_times.py --help
 ```
 
-___ 
 
 ## Schema for info.json
 
@@ -274,7 +277,6 @@ When you are finished editing your jsonfile, run the program with
 ./run.py --input your_json_file_path
 ```
 
-___ 
 
 ## Troubleshooting
 
@@ -285,7 +287,6 @@ Currently the script does not validate the jsonfile. So a typo there will likely
 
 Running the script will generate logfile.log which you should inspect if you run into any issues.
 
-___ 
 
 ## Miscellaneous
 
@@ -294,7 +295,7 @@ Future work includes the ability to referece camera actions into sequences, and 
 For serial cable connections we recommend [Hap Griffin Astrocables](https://imaginginfinity.com/astrocables.htm), or [make your own!](https://www.covingtoninnovations.com/dslr/canonrelease40d.html).
 
 
-___ 
+
 
 ## Authors
 

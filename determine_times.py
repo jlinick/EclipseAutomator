@@ -7,7 +7,10 @@ import requests
 import argparse
 import pytz
 from dateutil import parser
-from timezonefinder import TimezoneFinder 
+from timezonefinder import TimezoneFinder
+import serial
+import serial.tools.list_ports
+import pynmea2
 
 '''retrieves the specific eclipse timings given your lat, lon, height, and eclipse date'''
 
@@ -65,6 +68,8 @@ def format_date(input_date):
 def parse_times(input_json, timezone):
     '''parses the times from the input json and converts them into datetime objects, and returns them as a mapped dictionary'''
     prop = input_json.get('properties', {})
+    if 'Partial' in prop.get('description', None):
+        raise Exception(f'Totality does not occur at this position! Only a partial eclipse is visible! \n\n USNO JSON: {prop}')
     e_date = datetime.date(prop.get('year',0), prop.get('month',0), prop.get('day',0))
     pmap = {'Eclipse Begins': None,'Totality Begins':None,'Maximum Eclipse': None,'Totality Ends': None,'Eclipse Ends': None}
     ld_lst = prop.get('local_data', [])
@@ -79,12 +84,6 @@ def parse_times(input_json, timezone):
 def combine(date, time_string, timezone):
     '''combines the date object and time string to generate a datetime object, sets the timezone explicitly to utc, then formats it to the given timezone'''
     return datetime.datetime.combine(date, datetime.datetime.strptime(time_string, '%H:%M:%S.%f').time()).replace(tzinfo=pytz.utc).astimezone(timezone)
-
-#def to_str(dt, timezone):
-#    '''takes the datetime object and returns it as an iso formatted stringreturns in a formatted string with timezone'''
-#    if dt.tzinfo is None:    
-#        return dt.astimezone(timezone)isoformat() # the datetimes returned from usno are in UTC
-#    return dt.astimezone(timezone)isoformat() # Format as ISO
         
 def get_timezone(lat, lon):
     '''returns the timezone object for the given lat and lon'''
@@ -106,10 +105,61 @@ def update_event_times(file_path, time_mapping):
     with open(file_path, 'w') as file:
         json.dump(data, file, indent=2)
 
-def run(json_file, lat, lon, height, date=None, noupdate=False):
+
+def find_gps_port():
+    '''attempts to find and return the gps port on the computer'''
+    ports = serial.tools.list_ports.comports()
+    for port in ports:
+        try:
+            with serial.Serial(port.device, baudrate=4800, timeout=1) as ser:
+                data = ser.readline()
+                try:
+                    # Try to parse the data as an NMEA sentence
+                    msg = pynmea2.parse(data.decode('ascii', errors='replace'))
+                    print(f"GPS dongle found on {port.device}")
+                    return port.device
+                except pynmea2.ParseError:
+                    # Not a valid NMEA sentence, so this is likely not a GPS dongle
+                    pass
+        except serial.SerialException:
+            pass
+    return None
+
+def get_current_location():
+    '''attempts to get the current location from a gps dongle. returns the (lat, lon, height)'''
+    serial_port = find_gps_port()
+    if serial_port is None:
+        raise Exception('gps serial port not found! connect gps device, or specify latitude and longitude.')
+    ser = serial.Serial(serial_port, 9600)
+    print('waiting for gps signal...')
+    while True:
+        data = ser.readline().decode()
+        msg = pynmea2.parse(data)
+        if msg.sentence_type == "GGA":
+            lat = convert_to_decimal_degrees(float(msg.lat), msg.lat_dir)
+            lon = convert_to_decimal_degrees(float(msg.lon), msg.lon_dir)
+            height = int(msg.altitude)  # in meters
+            print(f'found position: ({lat}\u00B0, {lon}\u00B0), at {height} meters.')
+            if not lat is None and not lon is None and not height is None:
+                return(lat, lon, height)
+
+def convert_to_decimal_degrees(degrees_minutes, direction):
+    # Split the degrees and minutes
+    degrees = int(degrees_minutes) // 100
+    minutes = float(degrees_minutes) % 100
+    # Convert minutes to degrees and add to the degrees
+    decimal_degrees = degrees + minutes / 60
+    # Adjust for direction
+    if direction in ['S', 'W']:
+        decimal_degrees *= -1
+    return decimal_degrees
+
+def run(json_file, lat, lon, height, date=None, noupdate=False, auto=False):
     '''main function that validates inputs, queries for eclipse times, and prints/saves the result'''
     if not os.path.exists(json_file):
         raise Exception(f'json file does not exist: {json_file}')
+    if auto is True or lat is None or lon is None:
+        lat, lon, height = get_current_location()
     if not -90 <= lat <= 90:
         raise Exception(f'latitude not within proper bounds: {lat}')
     if not -180 <= lon <= 180:
@@ -134,14 +184,15 @@ def argparser():
     '''
     parse = argparse.ArgumentParser(description="Run Eclipse Automator for controlling USB and Serial Cameras")
     parse.add_argument('--input', type=str, default='info.json', help="Path to the JSON config file. Default is 'info.json'.")    
-    parse.add_argument('--lat', required=True, type=float, help='Decimal latitude of your location (within the path of totality)')
-    parse.add_argument('--lon', required=True, type=float, help='Decimal longitude of your location (within the path of totality)')
+    parse.add_argument('--lat', required=False, type=float, default=None, help='Decimal latitude of your location (within the path of totality)')
+    parse.add_argument('--lon', required=False, type=float, default=None, help='Decimal longitude of your location (within the path of totality)')
     parse.add_argument('--height', required=False, type=int, default=0, help='Integer height of your observing location (meters)')
     parse.add_argument('--date', required=False, default=None, help='Date of the eclipse YYYY-MM-DD (defaults to the next total eclipse)')
     parse.add_argument("--noupdate", action='store_true', default=False, help="prints the datetimes, but does not update the jsonfile")
+    parse.add_argument("--auto", action='store_true', default=False, help="attempts to determine latitude and longitude from a gps device.")
     return parse
 
 
 if __name__ == '__main__':
     args = argparser().parse_args() # parse input arguments
-    run(args.input, args.lat, args.lon, args.height, date=args.date, noupdate=args.noupdate)
+    run(args.input, args.lat, args.lon, args.height, date=args.date, noupdate=args.noupdate, auto=args.auto)

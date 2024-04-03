@@ -11,6 +11,7 @@ numpy==1.26.4
 pycparser==2.22
 pyfiglet==1.0.2
 Pygments==2.17.2
+pynmea2==1.19.0
 pynput==1.7.6
 pyobjc-core==10.2
 pyobjc-framework-ApplicationServices==10.2
