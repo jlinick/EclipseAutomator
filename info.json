@@ -1,91 +1,470 @@
 {
-	"events":[
-		{"name": "c1", "time": "2024-04-08 10:16:57.1", "text": "First Contact"},
-		{"name": "c2", "time": "2024-04-08 11:34:20.4", "text": "Beginning of Totality"},
-		{"name": "max","time": "2024-04-08 11:36:32.1", "text": "Maximum Eclipse"},
-		{"name": "c3", "time": "2024-04-08 11:38:43.8", "text": "End of Totality"},
-		{"name": "c4", "time": "2024-04-08 12:57:30.3", "text": "End of Eclipse"}
-	],
-	"equipment":[
-		{"f_ratio": 6.3, "iso": 400, "enhancement_factor": 1.0}
-	],
-	"phases":[
-		{"end": "c1", "text": "Pre-Eclipse"},
-		{"start": "c1", "end": "c2", "text": "Partial"},
-		{"start": "c2", "end": "c3", "text": "Totality"},
-		{"start": "c3", "end": "c4", "text": "Partial"},
-		{"start": "c4", "text": "Post-Eclipse"}
-	],
-	"voice_actions":[
-		{"text": "First phase of the eclipse begins in 20 minutes.", "time": "c1", "offset": -1200},
-		{"text": "First phase of the eclipse begins in 10 minutes.", "time": "c1", "offset": -600},
-		{"text": "First phase of the eclipse begins in 5 minutes.", "time": "c1", "offset": -300},
-		{"text": "First phase of the eclipse begins in one minute.", "time": "c1", "offset": -60},
-		{"text": "Partial phase of the eclipse starts in .", "time": "c1", "offset": -8},
-		{"text": "5.", "time": "c1", "offset": -5},
-		{"text": "4.", "time": "c1", "offset": -4},
-		{"text": "3.", "time": "c1", "offset": -3},
-		{"text": "2.", "time": "c1", "offset": -2},
-		{"text": "1.", "time": "c1", "offset": -1},
-		{"text": "Eclipse has begun.", "time": "c1", "offset": 0},
-		{"text": "Totality begins in 30 minutes.", "time": "c2", "offset": -1800},
-		{"text": "Totality begins in 20 minutes.", "time": "c2", "offset": -1200},
-		{"text": "Totality begins in 15 minutes.", "time": "c2", "offset": -900},
-		{"text": "Totality begins in 10 minutes.", "time": "c2", "offset": -600},
-		{"text": "Totality begins in 5 minutes.", "time": "c2", "offset": -300},
-		{"text": "Totality begins in 4 minutes.", "time": "c2", "offset": -120},
-		{"text": "Totality begins in 3 minutes.", "time": "c2", "offset": -120},
-		{"text": "Totality begins in 2 minutes.", "time": "c2", "offset": -120},
-		{"text": "Totality begins in 1 minute.", "time": "c2", "offset": -60},
-		{"text": "45 seconds.", "time": "c2", "offset": -45},
-		{"text": "30 seconds.", "time": "c2", "offset": -30},
-		{"text": "Prepare to remove camera filters.", "time": "c2", "offset": -20},
-		{"text": "Filters off! Filters off!.", "time": "c2", "offset": -13},
-		{"text": "Totality in 10 seconds.", "time": "c2", "offset": -10},
-		{"text": "Totality in.", "time": "c2", "offset": -6},
-		{"text": "5.", "time": "c2", "offset": -5},
-		{"text": "4.", "time": "c2", "offset": -4},
-		{"text": "3.", "time": "c2", "offset": -3},
-		{"text": "2.", "time": "c2", "offset": -2},
-		{"text": "1.", "time": "c2", "offset": -1},
-		{"text": "Totality has begun! You may now look directly at the eclipse.", "time": "c2", "offset": 0},
-		{"text": "Maximum eclipse in 30 seconds.", "time": "max", "offset": -30},
-		{"text": "We are now at max eclipse.", "time": "max", "offset": 0},
-		{"text": "Totality ends in 1 minute.", "time": "c3", "offset": -60},
-		{"text": "Totality ends in 10 seconds.", "time": "c3", "offset": -10},
-		{"text": "5.", "time": "c3", "offset": -5},
-		{"text": "4.", "time": "c3", "offset": -4},
-		{"text": "3.", "time": "c3", "offset": -3},
-		{"text": "2.", "time": "c3", "offset": -2},
-		{"text": "1.", "time": "c3", "offset": -1},
-		{"text": "Totality is complete. Do not look directly at the Sun.", "time": "c3", "offset": 0},
-		{"text": "Prepare to replace filters.", "time": "c3", "offset": 5},
-		{"text": "Filters on! Filters on!.", "time": "c3", "offset": 12},
-		{"text": "Eclipse ends in 5 minutes.", "time": "c4", "offset": -300},
-		{"text": "Eclipse is complete.", "time": "c4", "offset": 0}
-	],
-	"camera_actions":[
-		{"text": "Partial Phase", "shutter": "1/200", "start": "c1", "end":"c2", "end_offset":-14, "interval": 30},
-		{"text": "Capturing Baily's Beads", "shutter": "Baily's Beads", "start": "c2", "start_offset": -12, "end":"c2", "end_offset": 6},
-		{"text": "Capturing Chromosphere", "shutter": "Chromosphere", "start":"c2", "start_offset":6, "end":"c2", "end_offset":16},
-		{"text": "Capturing Prominences", "shutter": "Prominences", "start":"c2", "start_offset":16, "end":"c2", "end_offset":26},
-		{"text": "Corona - 0.1 Rs", "shutter": "Corona - 0.1 Rs", "start":"c2", "start_offset":26, "end":"c2", "end_offset":36},
-		{"text": "Corona - 0.5 Rs", "shutter": "Corona - 0.5 Rs", "start":"c2", "start_offset":36, "end":"c2", "end_offset":46},
-		{"text": "Corona - 1.0 Rs", "shutter": "Corona - 1.0 Rs", "start":"c2", "start_offset":46, "end":"c2", "end_offset":56},
-		{"text": "Corona - 2.0 Rs", "shutter": "Corona - 2.0 Rs", "start":"c2", "start_offset":56, "end":"c2", "end_offset":66},
-		{"text": "Corona - 4.0 Rs", "shutter": "Corona - 4.0 Rs", "start":"c2", "start_offset":66, "end":"c2", "end_offset":76},
-		{"text": "Corona - 8.0 Rs", "shutter": "Corona - 8.0 Rs", "start":"c2", "start_offset":76, "end":"c2", "end_offset":86},
-		{"text": "Corona - 0.1 Rs", "shutter": "Corona - 0.1 Rs", "start":"c2", "start_offset":86, "end":"max", "end_offset":-16},
-		{"text": "Earthshine", "shutter":"8", "start":"max", "start_offset":-16, "end":"max", "end_offset":16},
-		{"text": "Corona - 8.0 Rs", "shutter": "Corona - 8.0 Rs", "start":"max", "start_offset":16, "end":"max", "end_offset":26},
-		{"text": "Corona - 4.0 Rs", "shutter": "Corona - 4.0 Rs", "start":"max", "start_offset":26, "end":"max", "end_offset":36},	
-		{"text": "Corona - 2.0 Rs", "shutter": "Corona - 2.0 Rs", "start":"max", "start_offset":36, "end":"max", "end_offset":46},
-		{"text": "Corona - 1.0 Rs", "shutter": "Corona - 1.0 Rs", "start":"max", "start_offset":46, "end":"max", "end_offset":56},
-		{"text": "Corona - 0.5 Rs", "shutter": "Corona - 0.5 Rs", "start":"max", "start_offset":56, "end":"max", "end_offset":66},
-		{"text": "Corona - 0.1 Rs", "shutter": "Corona - 0.1 Rs", "start":"max", "start_offset":66, "end":"max", "end_offset":76},
-		{"text": "Capturing Prominences", "shutter": "Prominences", "start":"max", "start_offset":76, "end":"max", "end_offset":86},
-		{"text": "Capturing Chromosphere", "shutter": "Chromosphere", "start":"max", "start_offset":86, "end":"c3", "end_offset":0},
-		{"text": "Capturing Baily's Beads", "shutter": "Baily's Beads", "start": "c3", "end_offset": 0, "end":"c3", "end_offset": 12},
-		{"text": "Partial Phase", "shutter": "1/200", "start": "c3", "end": "c4", "start_offset": 14, "interval":30}
-	]
+  "events": [
+    {
+      "name": "c1",
+      "time": "2024-04-08T12:16:53.200000-05:00",
+      "text": "First Contact"
+    },
+    {
+      "name": "c2",
+      "time": "2024-04-08T13:34:15.700000-05:00",
+      "text": "Beginning of Totality"
+    },
+    {
+      "name": "max",
+      "time": "2024-04-08T13:36:27-05:00",
+      "text": "Maximum Eclipse"
+    },
+    {
+      "name": "c3",
+      "time": "2024-04-08T13:38:40.300000-05:00",
+      "text": "End of Totality"
+    },
+    {
+      "name": "c4",
+      "time": "2024-04-08T14:57:25.800000-05:00",
+      "text": "End of Eclipse"
+    }
+  ],
+  "equipment": [
+    {
+      "f_ratio": 6.3,
+      "iso": 400,
+      "enhancement_factor": 1.0
+    }
+  ],
+  "phases": [
+    {
+      "end": "c1",
+      "text": "Pre-Eclipse"
+    },
+    {
+      "start": "c1",
+      "end": "c2",
+      "text": "Partial"
+    },
+    {
+      "start": "c2",
+      "end": "c3",
+      "text": "Totality"
+    },
+    {
+      "start": "c3",
+      "end": "c4",
+      "text": "Partial"
+    },
+    {
+      "start": "c4",
+      "text": "Post-Eclipse"
+    }
+  ],
+  "voice_actions": [
+    {
+      "text": "First phase of the eclipse begins in 20 minutes.",
+      "time": "c1",
+      "offset": -1200
+    },
+    {
+      "text": "First phase of the eclipse begins in 10 minutes.",
+      "time": "c1",
+      "offset": -600
+    },
+    {
+      "text": "First phase of the eclipse begins in 5 minutes.",
+      "time": "c1",
+      "offset": -300
+    },
+    {
+      "text": "First phase of the eclipse begins in one minute.",
+      "time": "c1",
+      "offset": -60
+    },
+    {
+      "text": "Partial phase of the eclipse starts in .",
+      "time": "c1",
+      "offset": -8
+    },
+    {
+      "text": "5.",
+      "time": "c1",
+      "offset": -5
+    },
+    {
+      "text": "4.",
+      "time": "c1",
+      "offset": -4
+    },
+    {
+      "text": "3.",
+      "time": "c1",
+      "offset": -3
+    },
+    {
+      "text": "2.",
+      "time": "c1",
+      "offset": -2
+    },
+    {
+      "text": "1.",
+      "time": "c1",
+      "offset": -1
+    },
+    {
+      "text": "Eclipse has begun.",
+      "time": "c1",
+      "offset": 0
+    },
+    {
+      "text": "Totality begins in 30 minutes.",
+      "time": "c2",
+      "offset": -1800
+    },
+    {
+      "text": "Totality begins in 20 minutes.",
+      "time": "c2",
+      "offset": -1200
+    },
+    {
+      "text": "Totality begins in 15 minutes.",
+      "time": "c2",
+      "offset": -900
+    },
+    {
+      "text": "Totality begins in 10 minutes.",
+      "time": "c2",
+      "offset": -600
+    },
+    {
+      "text": "Totality begins in 5 minutes.",
+      "time": "c2",
+      "offset": -300
+    },
+    {
+      "text": "Totality begins in 4 minutes.",
+      "time": "c2",
+      "offset": -120
+    },
+    {
+      "text": "Totality begins in 3 minutes.",
+      "time": "c2",
+      "offset": -120
+    },
+    {
+      "text": "Totality begins in 2 minutes.",
+      "time": "c2",
+      "offset": -120
+    },
+    {
+      "text": "Totality begins in 1 minute.",
+      "time": "c2",
+      "offset": -60
+    },
+    {
+      "text": "45 seconds.",
+      "time": "c2",
+      "offset": -45
+    },
+    {
+      "text": "30 seconds.",
+      "time": "c2",
+      "offset": -30
+    },
+    {
+      "text": "Prepare to remove camera filters.",
+      "time": "c2",
+      "offset": -20
+    },
+    {
+      "text": "Filters off! Filters off!.",
+      "time": "c2",
+      "offset": -13
+    },
+    {
+      "text": "Totality in 10 seconds.",
+      "time": "c2",
+      "offset": -10
+    },
+    {
+      "text": "Totality in.",
+      "time": "c2",
+      "offset": -6
+    },
+    {
+      "text": "5.",
+      "time": "c2",
+      "offset": -5
+    },
+    {
+      "text": "4.",
+      "time": "c2",
+      "offset": -4
+    },
+    {
+      "text": "3.",
+      "time": "c2",
+      "offset": -3
+    },
+    {
+      "text": "2.",
+      "time": "c2",
+      "offset": -2
+    },
+    {
+      "text": "1.",
+      "time": "c2",
+      "offset": -1
+    },
+    {
+      "text": "Totality has begun! You may now look directly at the eclipse.",
+      "time": "c2",
+      "offset": 0
+    },
+    {
+      "text": "Maximum eclipse in 30 seconds.",
+      "time": "max",
+      "offset": -30
+    },
+    {
+      "text": "We are now at max eclipse.",
+      "time": "max",
+      "offset": 0
+    },
+    {
+      "text": "Totality ends in 1 minute.",
+      "time": "c3",
+      "offset": -60
+    },
+    {
+      "text": "Totality ends in 10 seconds.",
+      "time": "c3",
+      "offset": -10
+    },
+    {
+      "text": "5.",
+      "time": "c3",
+      "offset": -5
+    },
+    {
+      "text": "4.",
+      "time": "c3",
+      "offset": -4
+    },
+    {
+      "text": "3.",
+      "time": "c3",
+      "offset": -3
+    },
+    {
+      "text": "2.",
+      "time": "c3",
+      "offset": -2
+    },
+    {
+      "text": "1.",
+      "time": "c3",
+      "offset": -1
+    },
+    {
+      "text": "Totality is complete. Do not look directly at the Sun.",
+      "time": "c3",
+      "offset": 0
+    },
+    {
+      "text": "Prepare to replace filters.",
+      "time": "c3",
+      "offset": 5
+    },
+    {
+      "text": "Filters on! Filters on!.",
+      "time": "c3",
+      "offset": 12
+    },
+    {
+      "text": "Eclipse ends in 5 minutes.",
+      "time": "c4",
+      "offset": -300
+    },
+    {
+      "text": "Eclipse is complete.",
+      "time": "c4",
+      "offset": 0
+    }
+  ],
+  "camera_actions": [
+    {
+      "text": "Partial Phase",
+      "shutter": "1/200",
+      "start": "c1",
+      "end": "c2",
+      "end_offset": -14,
+      "interval": 30
+    },
+    {
+      "text": "Capturing Baily's Beads",
+      "shutter": "Baily's Beads",
+      "start": "c2",
+      "start_offset": -12,
+      "end": "c2",
+      "end_offset": 6
+    },
+    {
+      "text": "Capturing Chromosphere",
+      "shutter": "Chromosphere",
+      "start": "c2",
+      "start_offset": 6,
+      "end": "c2",
+      "end_offset": 16
+    },
+    {
+      "text": "Capturing Prominences",
+      "shutter": "Prominences",
+      "start": "c2",
+      "start_offset": 16,
+      "end": "c2",
+      "end_offset": 26
+    },
+    {
+      "text": "Corona - 0.1 Rs",
+      "shutter": "Corona - 0.1 Rs",
+      "start": "c2",
+      "start_offset": 26,
+      "end": "c2",
+      "end_offset": 36
+    },
+    {
+      "text": "Corona - 0.5 Rs",
+      "shutter": "Corona - 0.5 Rs",
+      "start": "c2",
+      "start_offset": 36,
+      "end": "c2",
+      "end_offset": 46
+    },
+    {
+      "text": "Corona - 1.0 Rs",
+      "shutter": "Corona - 1.0 Rs",
+      "start": "c2",
+      "start_offset": 46,
+      "end": "c2",
+      "end_offset": 56
+    },
+    {
+      "text": "Corona - 2.0 Rs",
+      "shutter": "Corona - 2.0 Rs",
+      "start": "c2",
+      "start_offset": 56,
+      "end": "c2",
+      "end_offset": 66
+    },
+    {
+      "text": "Corona - 4.0 Rs",
+      "shutter": "Corona - 4.0 Rs",
+      "start": "c2",
+      "start_offset": 66,
+      "end": "c2",
+      "end_offset": 76
+    },
+    {
+      "text": "Corona - 8.0 Rs",
+      "shutter": "Corona - 8.0 Rs",
+      "start": "c2",
+      "start_offset": 76,
+      "end": "c2",
+      "end_offset": 86
+    },
+    {
+      "text": "Corona - 0.1 Rs",
+      "shutter": "Corona - 0.1 Rs",
+      "start": "c2",
+      "start_offset": 86,
+      "end": "max",
+      "end_offset": -16
+    },
+    {
+      "text": "Earthshine",
+      "shutter": "8",
+      "start": "max",
+      "start_offset": -16,
+      "end": "max",
+      "end_offset": 16
+    },
+    {
+      "text": "Corona - 8.0 Rs",
+      "shutter": "Corona - 8.0 Rs",
+      "start": "max",
+      "start_offset": 16,
+      "end": "max",
+      "end_offset": 26
+    },
+    {
+      "text": "Corona - 4.0 Rs",
+      "shutter": "Corona - 4.0 Rs",
+      "start": "max",
+      "start_offset": 26,
+      "end": "max",
+      "end_offset": 36
+    },
+    {
+      "text": "Corona - 2.0 Rs",
+      "shutter": "Corona - 2.0 Rs",
+      "start": "max",
+      "start_offset": 36,
+      "end": "max",
+      "end_offset": 46
+    },
+    {
+      "text": "Corona - 1.0 Rs",
+      "shutter": "Corona - 1.0 Rs",
+      "start": "max",
+      "start_offset": 46,
+      "end": "max",
+      "end_offset": 56
+    },
+    {
+      "text": "Corona - 0.5 Rs",
+      "shutter": "Corona - 0.5 Rs",
+      "start": "max",
+      "start_offset": 56,
+      "end": "max",
+      "end_offset": 66
+    },
+    {
+      "text": "Corona - 0.1 Rs",
+      "shutter": "Corona - 0.1 Rs",
+      "start": "max",
+      "start_offset": 66,
+      "end": "max",
+      "end_offset": 76
+    },
+    {
+      "text": "Capturing Prominences",
+      "shutter": "Prominences",
+      "start": "max",
+      "start_offset": 76,
+      "end": "max",
+      "end_offset": 86
+    },
+    {
+      "text": "Capturing Chromosphere",
+      "shutter": "Chromosphere",
+      "start": "max",
+      "start_offset": 86,
+      "end": "c3",
+      "end_offset": 0
+    },
+    {
+      "text": "Capturing Baily's Beads",
+      "shutter": "Baily's Beads",
+      "start": "c3",
+      "end_offset": 12,
+      "end": "c3"
+    },
+    {
+      "text": "Partial Phase",
+      "shutter": "1/200",
+      "start": "c3",
+      "end": "c4",
+      "start_offset": 14,
+      "interval": 30
+    }
+  ]
 }

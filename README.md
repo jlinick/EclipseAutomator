@@ -18,11 +18,9 @@ ___
 
 ## Requirements
 
-In running the script, you will need to install the python libraries, and then edit the info.json file to include phase times, your equipment, and desired image sequence and voice notifications (see below for explanation of the json schema). 
+In running the script, you will need to install the python libraries, and then edit the info.json file to include phase times, your equipment, and desired image sequence and voice notifications (see below for explanation of the json schema).
 
-Currently, you will need some method to determine your particular eclipse timings given your location. Options include the [Navy Calculator](https://aa.usno.navy.mil/data/SolarEclipses), [Photo Ephemeris](https://app.photoephemeris.com/), and the [Solar Eclipse Timer App](https://www.solareclipsetimer.com/).
-
-You will need a camera and a usb connection. gphoto2 is required for usb camera control. (eg `sudo apt-get install gphoto2` or `brew install gphoto2`) Event audio notifcations are currently only supported by OSX.
+You will need a camera and a usb connection. gphoto2 is required for usb camera control. (eg `sudo apt-get install gphoto2` or `brew install gphoto2`) Event audio notifcations are currently only supported by OSX. An internet connection is necessary to update eclipse timings if your observing location changes, but is not required to run the orchestration script.
 
 ___ 
 
@@ -70,7 +68,7 @@ To test Eclipse Automator, plug in your camera and run
 This starts a test 95 seconds before c2. Simply change the number to change where the test starts. Positive numbers will be after the start of totality, negative numbers will be before it.
 
 
-To run with or without gui/voice notifications/keyboard input run
+To run the script with or without gui/voice notifications/keyboard input
 ```
 ./run.py --nodisplay --nosound --noinput
 ```
@@ -85,24 +83,50 @@ On the day of the eclipse simply run
 ./run.py
 ```
 
+For more information
+```
+./run.py --help
+```
+
+___ 
+
+## Determining your Eclipse timings
+
+
+You will need to input your observing location if you want the script to determine the exact timings of the eclipse. This is done through the `determine_times.py` script. An example for the 2024 Total Eclipse would be
+
+```
+./determine_times.py --lat 30.639372 --lon -98.409038 --height 258 --date 2024-04-08 --input info.json
+```
+
+This will query the US Naval Observatory API for the exact eclipse timings for your location, then parse the response and fill out info.json with the event times. This does require an internet connection to run, so we recommend you run this either ahead of time, or, if you are mobile on the day of the eclipse connect to a mobile hotspot. Alternatively, you can use an eclipse timing app and input the times into the json [(see events below)](#events-(optional)).
+
+You can see more details about how to run the script through
+
+```
+./determine_times.py --help
+```
+
+___ 
 
 ## Schema for info.json
 
 The info jsonfile is structured into a 5 parts: events, equipment, phases, voice_actions, and camera actions. This is where you set timings, and orchestration for all your cameras. You can create several different jsonfiles, and run each with the --input filename.json in the run.py command.
 
-### events
+### events (optional)
 
-The events list is where you specify the timing of c1, c2, c3, max eclipse, and c4. This should be set to your exact location (we recommend something like the Solar Eclipse Timer App https://www.solareclipsetimer.com/ )
+If you didn't use the `determine_times.py` script and want to set eclipse timings manually, you can find timings from other sources such as [Photo Ephemeris](https://app.photoephemeris.com/) or the [Solar Eclipse Timer App](https://www.solareclipsetimer.com/), and fill in the proper ISO format as shown below:
+
 ```
 "events":[
-    {"name": "c1", "time": "2024-04-08 10:16:57.1", "text": "First Contact"},
-    {"name": "c2", "time": "2024-04-08 11:34:20.4", "text": "Beginning of Totality"},
-    {"name": "max","time": "2024-04-08 11:36:32.1", "text": "Maximum Eclipse"},
-    {"name": "c3", "time": "2024-04-08 11:38:43.8", "text": "End of Totality"},
-    {"name": "c4", "time": "2024-04-08 12:57:30.3", "text": "End of Eclipse"}
+    {"name": "c1", "time": "2024-04-08T12:16:53.200000-05:00", "text": "First Contact"},
+    {"name": "c2", "time": "2024-04-08T13:34:15.700000-05:00", "text": "Beginning of Totality"},
+    {"name": "max","time": "2024-04-08T13:36:27-05:00", "text": "Maximum Eclipse"},
+    {"name": "c3", "time": "2024-04-08T13:38:40.300000-05:00", "text": "End of Totality"},
+    {"name": "c4", "time": "2024-04-08T14:57:25.800000-05:00", "text": "End of Eclipse"}
 ],
 ```
-All of the subsequent events are based on these times, so these need to be entered precisely. *note that all times should be in local time - or in whatever time your computer is set to*
+All of the subsequent events are based on these times, so these need to be entered precisely. We recommend you use proper ISO formatting with the timezone. It is better to be explicit rateher than implicit, and if timezone is not included, the timings will default to your currently set computer timezone.
 
 ### equipment
 
@@ -259,13 +283,13 @@ Note that many cameras will go to sleep if connected to a usb port without activ
 
 Currently the script does not validate the jsonfile. So a typo there will likely cause the script not to run. Make sure your json is formatted properly!
 
-Running the script will generate a run.log logfile, which you should inspect if you run into any issues.
+Running the script will generate logfile.log which you should inspect if you run into any issues.
 
 ___ 
 
 ## Miscellaneous
 
-Future work includes the ability to referece camera actions into sequences, and then run specific sequences in whatever order you like (or as filler, for example). I would also like have an optional query to the [US Navy's API](https://aa.usno.navy.mil/data/api) to set the timings from your location. Neither of these will likely be added before the April 8th, 2024 eclipse- unless, of course, you decide to add them yourself!
+Future work includes the ability to referece camera actions into sequences, and then run specific sequences in whatever order you prefer.
 
 For serial cable connections we recommend [Hap Griffin Astrocables](https://imaginginfinity.com/astrocables.htm), or [make your own!](https://www.covingtoninnovations.com/dslr/canonrelease40d.html).
 

@@ -3,8 +3,6 @@
 import sys
 import os
 import re
-import math
-import serial
 import time
 import datetime
 import json
@@ -13,6 +11,8 @@ import glob
 import subprocess
 import queue
 import threading
+
+import serial
 from dateutil import parser
 import warnings
 import logging
@@ -20,7 +20,7 @@ import argparse
 
 '''Script for automating eclipse based on known c1,c2,c3,c4 datetimes'''
 
-logging.basicConfig(filename='run.log', level=logging.DEBUG, filemode='a', format='%(asctime)s : %(name)s : %(levelname)s : %(message)s')
+logging.basicConfig(filename='logfile.log', level=logging.DEBUG, filemode='a', format='%(asctime)s : %(name)s : %(levelname)s : %(message)s')
 
 # shutters allowed by camera
 allowable_shutters = ["1/8000","1/6400", "1/5000", "1/4000", "1/3200", "1/2500", "1/2000",
@@ -37,9 +37,9 @@ allowable_targets = ['Partial, ND 4.0', 'Partial, ND 5.0', 'Baily\'s Beads', 'Ch
 
 class EclipseAutomation():
     '''main object for running eclipse automation loop'''
-    
+
     def __init__(self, test=None, inputfile='input.json', nodisplay=False, nosound=False, noinput=False, verbose=False):
-        logging.info('starting imports for optional libraries.') # imports for optional libraries
+        logging.info('--------------------starting run.--------------------') # imports for optional libraries
         self.test = test
         self.inputfile = inputfile
         self.nodisplay = nodisplay
@@ -71,7 +71,7 @@ class EclipseAutomation():
 
     def loop(self):
         '''main loop that dispatches actions and refreshes the screen'''
-        while(not self.is_over()):
+        while not self.is_over():
             now = self.t.get_now()
             # run camera actions
             cactions = self.t.camera_actions.get_allowable(now)
@@ -119,7 +119,6 @@ class EclipseAutomation():
 
     def update_layout(self):
         '''updates the panels with current information'''
-        now = self.t.get_now()
         self.layout['header'].update(self.gen_title_panel())
         self.layout['timer'].update(self.gen_timer_panel())
         self.layout["body"]["upper"].update(self.gen_current_table())
@@ -129,7 +128,7 @@ class EclipseAutomation():
     def gen_title_panel(self):
         now = self.t.get_now()
         dat = now.strftime('%B %-d, %Y (%Z)')
-        tim = now.strftime('%I:%M:%S %p')
+        tim = now.strftime('%H:%M:%S')#'%I:%M:%S %p')
         date_text = rich.text.Text(dat, style="b blue")
         bigtime = pyfiglet.Figlet(font="moscow").renderText(tim).replace("#", "█")
         time_text = rich.text.Text(bigtime, style="b green")
@@ -142,7 +141,7 @@ class EclipseAutomation():
             box=rich.box.ROUNDED,
             padding=(1, 1),
             title='Eclipse Automator',
-            subtitle='by Justin Linick',
+            subtitle='by J.P. Linick',
             border_style="blue",
         )
         return title_panel
@@ -171,7 +170,6 @@ class EclipseAutomation():
         table.add_column("Int", justify="right", style="green", min_width=20)
         for act in actions:
             dt =  act.time_left()
-            tstr = '{:.1f}'.format(dt)
             progbar = progressbar(dt, length=30, max_sec=30)
             typ = act.text
             cam_id = self.dispatcher.get_camera_id(act)
@@ -197,7 +195,6 @@ class EclipseAutomation():
         table.add_column("Int", justify="right", style="green")
         for act in actions:
             dt = act.time_until()
-            tstr = '{:.1f}'.format(dt)
             progbar = progressbar(dt, length=40, max_sec=40)
             typ = act.text
             cam_id = self.dispatcher.get_camera_id(act)
@@ -235,7 +232,7 @@ class EclipseAutomation():
         curr_time = self.t.get_now()
         curr_phase = self.t.get_current_phase()
         next_event = self.t.get_next_event()
-        saystr = 'We are currently in the {} phase. {} until {}'.format(self.t.get_current_phase(),
+        saystr = 'We are currently in the {} phase. {} until {}'.format(curr_phase,
             format_timedelta(curr_time, next_event.time), next_event)
         say(saystr)
 
@@ -253,7 +250,7 @@ class EclipseAutomation():
             elif key == keyboard.Key.esc:
                 self.exit()
         except AttributeError as e:
-            logging.error(f'Error in key press: {e}')
+            logging.error('Error in key press: %s', e)
 
     def enhancement_up(self):
         logging.info(f'raising enhancement factor')
@@ -335,31 +332,15 @@ class Timeholder():
             json_obj = json.load(file)
         return json_obj
 
-    def build_events(self, json_obj, verbose=False):
+    def build_events(self, json_obj):
         self.events = Events(json_obj, self.get_local_tz())
-        if verbose:
-            print('--Events--')
-            [print(a) for a in self.events.events]
-            print(self.events.events)
 
-    def build_phases(self, json_obj, verbose=False):
+    def build_phases(self, json_obj):
         self.phases = Phases(json_obj, self.events)
-        if verbose:
-            print('--Phases--')
-            [print(a) for a in self.phases.phases]
-            print(self.phases.phases)
 
-    def build_actions(self, json_obj, verbose=False):
+    def build_actions(self, json_obj):
         self.camera_actions = CameraActions(json_obj, self.events, self.get_now)
-        if verbose:
-            logging.info('--Camera Actions--')
-            [logging.info(a) for a in self.camera_actions.actions]
-            logging.info(self.camera_actions.actions)
         self.voice_actions = VoiceActions(json_obj, self.events, self.get_now)
-        if verbose:
-            logging.info('--Voice Actions--')
-            [logging.info(a) for a in self.voice_actions.actions]
-            logging.info(self.voice_actions.actions)
 
     def get_local_tz(self):
         '''returns the local timezone, saves as class object (referenced outside class)'''
@@ -368,10 +349,10 @@ class Timeholder():
             return self.local_tz
         return self.local_tz
 
-    def string_to_dt(self, input_string):
-        '''parses a string and returns a datetime in the local timezone'''
-        local_tz = self.get_local_tz()
-        return datetime.datetime.strptime(input_string, "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=local_tz)
+    #def string_to_dt(self, input_string):
+    #    '''parses a string and returns a datetime in the local timezone'''
+    #    local_tz = self.get_local_tz()
+    #    return datetime.datetime.strptime(input_string, "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=local_tz)
 
     def get_next_event(self):
         '''returns the next event'''
@@ -420,15 +401,28 @@ class Event():
     '''represents specific event times for c1, c2, c3, c4'''
     def __init__(self, event_dict, tzinfo):
         self.name = event_dict.get('name', 'unknown')
-        tm = event_dict.get('time', None)
-        self.time = datetime.datetime.strptime(tm, "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=tzinfo)
-        try:
-            self.time = parser.parse(tm).replace(tzinfo=tzinfo)
-        except:
-            logging.error(f'unable to parse input time: {tm}')
-            raise Exception(f'unable to parse input time: {tm}')
+        self.time = self.parse_time(event_dict, tzinfo)
         self.text = event_dict.get('text', 'unknown')
         logging.info(f'parsed time of event {self.text}: {self.time}')
+
+    def parse_time(self, event_dict, tzinfo):
+        '''returns the datetime object from the time string tm'''
+        tm = event_dict.get('time', None)
+        try:
+            ztim = datetime.datetime.fromisoformat(tm) # First attempt to parse with explicit format
+        except ValueError as v:
+            logging.warning(f'ValueError {v}')
+            # If the first parsing attempt fails, try with dateutil.parser
+            try:
+                ztim = parser.parse(tm)
+            except ValueError:
+                # Raise an exception if second parsing attempt fails
+                logging.error(f'Unable to parse provided datetime string: {tm}')
+                raise Exception(f'Unable to parse provided datetime string: {tm}')
+        if ztim.tzinfo is None:
+            ztim = ztim.replace(tzinfo=tzinfo)
+            logging.warning(f'Time given by: {tm} is not timezone aware! We recommend explicit rather than implicit timezones. Assuming times are given in {tzinfo}.')
+        return ztim
 
     def get_time(self):
         return self.time
@@ -489,7 +483,7 @@ class Event():
     def __add__(self, other):
         if isinstance(other, datetime.datetime):
             return (self.time + other).total_seconds()
-        if isinstance(other, event):
+        if isinstance(other, Event):
             return (self.time + other.time).total_seconds()
         if isinstance(other, int) or isinstance(other, float):
             return self.time + datetime.timedelta(seconds=other)
@@ -729,9 +723,9 @@ class CameraAction(Action):
     def __init__(self, dct, events, get_now):
         super().__init__(dct, events, get_now)
         self.last_took_photo = None
-        self.parse_additional_info(dct, events)
+        self.parse_additional_info(dct)
 
-    def parse_additional_info(self, dct, events):
+    def parse_additional_info(self, dct):
         '''parses out additional metadata in the json'''
         self.interval = dct.get('interval', None)
         self.shutter = dct.get('shutter', None)
@@ -934,8 +928,8 @@ class Camera():
         # test usb port
         cam_dct = query_for_usb_cameras() # camera/usb port pairs
         if not usb_port is None and not usb_port in cam_dct.values():
-            raise Exception('usb port not found: {}'.format(usb_port))
             logging.error('usb port not found: {}'.format(usb_port))
+            raise Exception('usb port not found: {}'.format(usb_port))
         if usb_port is None:
             # if the camera id matches the gphoto2 id, use the appropriate port
             if self.camera_id in cam_dct.keys():
@@ -1146,7 +1140,6 @@ def format_hms(start, end):
     hours, remainder = divmod(seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
     parts = []
-    mparts = []
     if days > 0:
         parts.append(f"{days}")
     if hours > 0 or (days > 0 and minutes > 0):
@@ -1198,9 +1191,9 @@ def format_timedelta(start, end):
 def say(text, voice=None):
     logging.info(f'saying "{text}"')
     if voice is None:
-        command = 'say -r 184 "{}"'.format(text)
+        command = f'say -r 184 "{text}"'
     else:
-        command = 'say -r 184 -v {} "{}"'.format(voice, text)
+        command = f'say -r 184 -v {voice} "{text}"'
     def target():
         subprocess.run(command, shell=True)
     thread = threading.Thread(target=target)
