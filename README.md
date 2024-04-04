@@ -1,21 +1,21 @@
 
 # Eclipse Automator
 
-This script offers a lightweight and fully customizable solution for the automated orchestration of photography of total solar eclipses. It is designed to control an unlimited number of cameras through both USB and serial connections, and allows users to completely customize their imaging sequences, by device. It provices optional customizable voice notifications, audio alerts, and countdowns, alongside an optional terminal-based graphical user interface (GUI). It can determine appropriate of exposure times based on your equipment, and supports gps devices for automatic determination of eclipse timings.
+This script offers a lightweight and highly customizable solution for the automated orchestration of photography of total solar eclipses. It is designed to control an unlimited number of cameras through both USB and serial connections, and allows users to completely customize their imaging sequence. It provides optional customizable voice notifications, audio alerts and countdowns, alongside an optional terminal-based graphical user interface (GUI). It can determine appropriate of exposure times based on your equipment, and supports gps devices for automatic determination of eclipse timings.
 
-This utility enables photographers to manage multiple cameras from a single computer, facilitating sophisticated imaging sequences to be run virtually hands-free. Particularly, it supports serial connections, such as those used with Canon cameras, allowing for the capture of significantly more data during the critical period of totality. It also provides the ability to adjust global exposure durations in real-time via the up and down keypresses, allowing for immediate correction of any issues with under or overexposure.
+This utility enables photographers to manage multiple cameras from a single computer, facilitating sophisticated imaging sequences to be run hands-free. Particularly, it supports serial connections, such as those used with Canon cameras, allowing for the capture of significantly more data during the critical period of totality. It also provides the ability to adjust global exposure durations in real-time via the up and down keypresses, allowing for immediate correction of any issues with under or overexposure.
 
-A simple dashboard presents a overview of active cameras, along with a queue of impending camera actions timings, and eclipse phase timer. This entire process is customizable through a single JSON file. Moreover, the script offers the functionality to run tests of your automation sequences at any chosen starting point via a single command.
+A simple dashboard presents a overview of active cameras, along with a queue of impending camera actions timings, and eclipse phase countdown clock. Everything is orchestrated by a single JSON file. Moreover, running tests of your setup and the automation sequence is straightforward.
 
-In summary, this script simplifies many of the technical complexities of eclipse photography, allowing photographers to capture sophisticated sequences while also being able to enjoy the eclipse itself.
+In summary, this script simplifies many of the technical complexities of eclipse photography, allowing photographers to capture sophisticated sequences with multile telescope/camera rigs and adjust things quickly and easily to run properly: hopefully enabling them to enjoy more of the eclipse itself.
 
 ![Example Run](./example.png)
 
 ## Requirements
 
-In running the script, you will need to install the python libraries, and then edit the info.json file to include phase times, your equipment, and desired image sequence and voice notifications (see below for explanation of the json schema).
+This script is fully open-source and requires only gphoto2 and python libraries to run. (to install gphoto2: `sudo apt-get install gphoto2` or `brew install gphoto2`)
 
-You will need a camera and a usb connection. gphoto2 is required for usb camera control. (eg `sudo apt-get install gphoto2` or `brew install gphoto2`) Event audio notifcations are currently only supported by OSX. An internet connection is necessary to update eclipse timings if your observing location changes, but is not required to run the orchestration script.
+You will need a camera and a usb connection. Event audio notifcations currently probably only work on OSX, but it would be straightforward to port it to other platforms. An internet connection is helpful when updating eclipse timings and if you're observing location changes (like when trying to dodge clouds) a gps device will allow to skip putting in your location manually, but none of this is required to run the orchestration script.
 
 
 ## Installation
@@ -59,7 +59,7 @@ To test Eclipse Automator, plug in your camera and run
 ```
 ./run.py --test -95 --contact_time c2
 ```
-This starts a test 95 seconds before c2. Simply change the number to change where the test starts. Positive numbers will be after the start of totality, negative numbers will be before it.
+This starts a test 95 seconds before totality. Simply change --test *NUM* to shift the start of the test *NUM* seconds relative to the given contact time. 
 
 
 To run the script with or without gui/voice notifications/keyboard input
@@ -85,27 +85,28 @@ For more information
 
 ## Determining your Eclipse timings
 
-
-You will need to input your observing location if you want the script to determine the exact contact times of the eclipse. This is done through the `determine_times.py` script. 
+In order to determine appropriate contact times, you will need to have a gps device, enter your location coordinates, or [enter the contact times manually](#contact_times-(optional)). This process will place the contact times in a jsonfile, and is done through the `determine_times.py` script. 
 
 If you have a gps connected device you can run
 ```
 ./determine_times.py --auto
 ```
-And the script will find your gps device, wait for it to return position data, query the US Naval Observatory for eclipse timings for the next known total eclipse, and then fill info.json with those timings. You can also enter the date of a particular eclipse, as in
+And the script will find your gps device, use that position data to query the US Naval Observatory for contact times, and then fill the jsonfile with those timings. 
+
+You can also enter the date of a specific eclipse, as in
 ```
 ./determine_times.py --auto --date 2024-04-08
 ```
 
-Alternatively you can enter your location manually. An example for the 2024 Total Eclipse would be
+Alternatively, enter your location manually. An example for the 2024 Total Eclipse would be
 
 ```
 ./determine_times.py --lat 30.639372 --lon -98.409038 --height 258 --date 2024-04-08 --input info.json
 ```
 
-This will query the US Naval Observatory API for the exact eclipse timings for your location, then parse the response and fill out info.json. This does require an internet connection to run, so we recommend you run this either ahead of time, or, if you are mobile on the day of the eclipse connect to a mobile hotspot. Alternatively, you can use an eclipse timing app and input the times into the json [(see contact_times below)](#contact_times-(optional)).
+This will query the US Naval Observatory API for the exact eclipse timings for the given location and fill out info.json. This does require an internet connection to run as it queries the US Naval Observatory. Alternatively, you can use an eclipse timing app and input the times directly into the json [(see contact_times below)](#contact_times-(optional)).
 
-You can see more details about how to run the script through
+For more details
 
 ```
 ./determine_times.py --help
@@ -114,11 +115,11 @@ You can see more details about how to run the script through
 
 ## Schema for info.json
 
-The info jsonfile is structured into a 5 parts: contact_times, equipment, phases, voice_actions, and camera actions. This is where you set timings, and orchestration for all your cameras. You can create several different jsonfiles, and run each with the --input filename.json in the run.py command.
+The info jsonfile is structured into a 5 parts: contact_times, equipment, phases, voice_actions, and camera_actions. This is where you set all of the information necessary to run your custom orchestration. You can create several different jsonfiles, and run each with the --input filename.json in the run.py command.
 
 ### contact_times (optional)
 
-If you didn't use the `determine_times.py` script and want to set eclipse timings manually, you can find timings from other sources such as [Photo Ephemeris](https://app.photoephemeris.com/) or the [Solar Eclipse Timer App](https://www.solareclipsetimer.com/), and fill in the proper ISO format as shown below:
+If you didn't use the `determine_times.py` script and want to set eclipse timings manually, you can find timings from other sources such as [Photo Ephemeris](https://app.photoephemeris.com/) or the [Solar Eclipse Timer App](https://www.solareclipsetimer.com/), and enter them as shown below:
 
 ```
 "contact_times":[
@@ -129,7 +130,7 @@ If you didn't use the `determine_times.py` script and want to set eclipse timing
     {"name": "c4", "time": "2024-04-08T14:57:25.800000-05:00", "text": "End of Eclipse"}
 ],
 ```
-*Note that the automated actions are all based on these times, so these do need to be entered properly. If you enter them manually we recommend you use proper ISO formatting that includes the timezone, as it is better to be explicit rather than implicit- if timezone is not included the timings will default to your currently set computer timezone on runtime.*
+*Note that the automated actions are all based on these times, so ensure they are entered properly. If you enter them manually we recommend you use proper ISO formatting that includes the timezone (it is better to be explicit rather than implicit). If timezone is not included the timings will default to your currently set computer timezone on runtime.*
 
 ### equipment
 
@@ -141,7 +142,7 @@ This section is where you enter your camera info.
 ],
 ```
 
-`camera_id` should uniquely identify your camera, if only one camera is used it is not necessary. We recommend you use the camera name specified by gphoto2 (you can check by running `./show_devices.sh`). This will allow the script to identify the usb port of your equipment regardless if the port is connected to your computer. Otherwise, if you change the port your camera is plugged into you will need to specify the correct port in usb_port below.
+`camera_id` should uniquely identify your camera, if only one camera is used this is not necessary. We recommend you use the camera name specified by gphoto2 (you can check by running `./show_devices.sh`). This will allow the script to identify the usb port of your equipment automatically even with multiple cameras connected. Otherwise, if you change the port your camera is plugged into you will need to specify the correct port in usb_port below.
 
 `usb_port` (optional) the usb port of the camera. This will show up under /dev/tty\*usb\* Keep in mind if you plug your camera into different ports this will change. Runing `./show_devices.sh` should show you your connected cameras and their specific usb ports.
 
@@ -281,20 +282,18 @@ When you are finished editing your jsonfile, run the program with
 ## Troubleshooting
 
 
-Note that many cameras will go to sleep if connected to a usb port without activity for a set period of time, and therefore will not show up as a connected device. So before running your script, either reset the camera or press the shutter to wake the camera. If the camera is left connected but not used for some time, it may turn off and not recognize usb commands (so we recommend keeping it on an interval). A serial cable connection will still work and should wake the camera in these situations. Currently we recommend you run `show_devices.sh` before you start your script, to make sure usb cameras are connected. Note that if you leave some image editing programs running (like Adobe Lightroom/Photoshop), they will block use of these usb devices, so we recommend closing these programs before use.
+Note that many cameras will go to sleep if connected to a usb port without activity for a set period of time, and when that happens the camera will not show up as a connected device. So before running your script, either reset the camera or press the shutter to wake the camera. If the camera is left connected but not used for some time (like during the partial phase), it may go to sleep and not recognize usb commands (so we recommend keeping it on an interval). A serial cable connection should wake the camera in these situations. Currently we recommend you run `show_devices.sh` before you start your script, to make sure usb cameras are connected. Note that if you leave some image editing programs running (like Adobe Lightroom/Photoshop), they will block use of these usb devices, so we recommend closing these programs before use.
 
-Currently the script does not validate the jsonfile. So a typo there will likely cause the script not to run. Make sure your json is formatted properly!
+Currently the script does not validate the jsonfile. So a typo there will likely cause the script not to run properly. Make sure your json is correct and formatted properly! We recommend you test test test beforehand!
 
 Running the script will generate logfile.log which you should inspect if you run into any issues.
 
 
 ## Miscellaneous
 
-Future work includes the ability to referece camera actions into sequences, and then run specific sequences in whatever order you prefer.
+Future work includes the ability to referece camera actions into sequences, and then run specific sequences in whatever order you prefer. Also expand to Windows platforms and provide a Docker imaage.
 
-For serial cable connections we recommend [Hap Griffin Astrocables](https://imaginginfinity.com/astrocables.htm), or [make your own!](https://www.covingtoninnovations.com/dslr/canonrelease40d.html).
-
-
+For serial cable connections we've had success with [Hap Griffin Astrocables](https://imaginginfinity.com/astrocables.htm), or [make your own!](https://www.covingtoninnovations.com/dslr/canonrelease40d.html).
 
 
 ## Authors
