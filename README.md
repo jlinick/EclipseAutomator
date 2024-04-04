@@ -1,13 +1,13 @@
 
 # Eclipse Automator
 
-This script offers a lightweight and highly customizable solution for the automated orchestration of photography of total solar eclipses. It is designed to control an unlimited number of cameras through both USB and serial connections, and allows users to completely customize their imaging sequence. It provides optional customizable voice notifications, audio alerts and countdowns, alongside an optional terminal-based graphical user interface (GUI). It can determine appropriate of exposure times based on your equipment, and supports gps devices for automatic determination of eclipse timings.
+This script offers a lightweight and highly customizable solution for the orchestration of photography of total solar eclipses. It is designed to control an unlimited number of cameras through both USB and serial connections, and allows users to design their own imaging sequences. It provides optional customizable voice notifications, audio alerts and countdowns, alongside an optional terminal-based graphical user interface (GUI). It can calculate exposure times based on your equipment and eclipse phase, and supports gps devices for automatic determination of eclipse timings.
 
-This utility enables photographers to manage multiple cameras from a single computer, facilitating sophisticated imaging sequences to be run hands-free. Particularly, it supports serial connections, such as those used with Canon cameras, allowing for the capture of significantly more data during the critical period of totality. It also provides the ability to adjust global exposure durations in real-time via the up and down keypresses, allowing for immediate correction of any issues with under or overexposure.
+This package enables photographers to manage multiple cameras from a single computer, running multiple sophisticated imaging sequences simultaneously. By supporting serial connections, it can allow for the capture of significantly more data during the critical period of totality. It also provides the ability to adjust global exposure durations on the fly via the keyboard, allowing for immediate correction of any issues with under or overexposure.
 
-A simple dashboard presents a overview of active cameras, along with a queue of impending camera actions timings, and eclipse phase countdown clock. Everything is orchestrated by a single JSON file. Moreover, running tests of your setup and the automation sequence is straightforward.
+A simple dashboard presents a overview of active cameras, along with a queue of impending camera actions, and an eclipse phase countdown clock. Everything is orchestrated by editing a single JSON file. Moreover, running tests of your setup and the automation sequence is straightforward.
 
-In summary, this script simplifies many of the technical complexities of eclipse photography, allowing photographers to capture sophisticated sequences with multile telescope/camera rigs and adjust things quickly and easily to run properly: hopefully enabling them to enjoy more of the eclipse itself.
+In summary, this script simplifies many of the technical complexities of eclipse photography, allowing photographers to capture sophisticated sequences with multiple telescope/camera rigs and adjust their setup rapidly to get as much data as possible while allowing them to enjoy more of the eclipse itself.
 
 ![Example Run](./example.png)
 
@@ -15,7 +15,7 @@ In summary, this script simplifies many of the technical complexities of eclipse
 
 This script is fully open-source and requires only gphoto2 and python libraries to run. (to install gphoto2: `sudo apt-get install gphoto2` or `brew install gphoto2`)
 
-You will need a camera and a usb connection. Event audio notifcations currently probably only work on OSX, but it would be straightforward to port it to other platforms. An internet connection is helpful when updating eclipse timings and if you're observing location changes (like when trying to dodge clouds) a gps device will allow to skip putting in your location manually, but none of this is required to run the orchestration script.
+You will need a camera and a usb connection. Event audio notifcations currently probably only work on OSX, but it would be straightforward to port it to other platforms. An internet connection is helpful when updating eclipse timings and if your observing location changes (like when trying to dodge clouds). USB GPS devices will allow you to skip putting in your location manually, but none of this is required to run the orchestration script.
 
 
 ## Installation
@@ -69,7 +69,7 @@ To run the script with or without gui/voice notifications/keyboard input
 
 Or change the input.json file to a different one
 ```
-./run.py --input --test.json
+./run.py --input test.json
 ```
 
 On the day of the eclipse simply run
@@ -85,13 +85,13 @@ For more information
 
 ## Determining your Eclipse timings
 
-In order to determine appropriate contact times, you will need to have a gps device, enter your location coordinates, or [enter the contact times manually](#contact_times-(optional)). This process will place the contact times in a jsonfile, and is done through the `determine_times.py` script. 
+In order to determine appropriate contact times, you can choose between using a gps device, entering your location coordinates, or [entering the contact times manually](#contact_times-(optional)). This process will place the contact times in a jsonfile, and is done through the `determine_times.py` script. 
 
 If you have a gps connected device you can run
 ```
 ./determine_times.py --auto
 ```
-And the script will find your gps device, use that position data to query the US Naval Observatory for contact times, and then fill the jsonfile with those timings. 
+And the script will find your gps device, use that position data to query the US Naval Observatory for contact times, then fill the jsonfile with those timings. 
 
 You can also enter the date of a specific eclipse, as in
 ```
