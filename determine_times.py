@@ -79,6 +79,11 @@ def parse_times(input_json, timezone):
             pmap[p] = ev.get('time')
     # converts the times into properly timezone formatted list, then a key,value pair mapped dict (where the keys are c1,c2,max,c3,c4 as in the json schema)
     time_values = [combine(e_date, pmap.get(t), timezone).isoformat() for t in ['Eclipse Begins','Totality Begins','Maximum Eclipse','Totality Ends','Eclipse Ends']]
+    print(time_values)
+    d1 = (parser.parse(time_values[2]) - parser.parse(time_values[1])).total_seconds()
+    d2 = (parser.parse(time_values[3]) - parser.parse(time_values[2])).total_seconds()
+    tot = (parser.parse(time_values[3]) - parser.parse(time_values[1])).total_seconds()
+    print(f'Totality lasts {tot} seconds, with c1-max: {d1} seconds, and max-c2: {d2} seconds.')
     return dict(zip(['c1', 'c2', 'max', 'c3', 'c4'], time_values))
 
 def combine(date, time_string, timezone):
@@ -135,7 +140,7 @@ def get_current_location():
     while True:
         data = ser.readline().decode()
         msg = pynmea2.parse(data)
-        if msg.sentence_type == "GGA":
+        if msg.sentence_type == "GGA" and msg.lat != '' and msg.lon != '':
             lat = convert_to_decimal_degrees(float(msg.lat), msg.lat_dir)
             lon = convert_to_decimal_degrees(float(msg.lon), msg.lon_dir)
             height = int(msg.altitude)  # in meters
